@@ -17,22 +17,28 @@ spec:
     spec:
       containers:
       - name: mongo
-        image: mongo:latest
+        image: mongo:6.0
         ports:
         - containerPort: 27017
+        env:
+        - name: MONGODB_URI
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: MONGODB_URI
         volumeMounts:
         - name: mongo-data
           mountPath: /data/db
         livenessProbe:
           exec:
-            command: ["mongosh", "--eval", "db.adminCommand('ping')"]
+            command: ["mongo", "--eval", "db.adminCommand('ping')"]
           initialDelaySeconds: 20
           periodSeconds: 10
           timeoutSeconds: 5
           failureThreshold: 5
         readinessProbe:
           exec:
-            command: ["mongosh", "--eval", "db.adminCommand('ping')"]
+            command: ["mongo", "--eval", "db.adminCommand('ping')"]
           initialDelaySeconds: 20
           periodSeconds: 10
           timeoutSeconds: 5
